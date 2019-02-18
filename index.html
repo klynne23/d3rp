@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+    <!-- <link rel="stylesheet" href="index.css"> -->
+    <style type="text/css">
+        @import url('https://fonts.googleapis.com/css?family=Atma|Rubik+Mono+One');
+
+        .bar {
+            fill: blue;
+        }
+
+        #title {
+            font-size: 7em;
+            font-family: "Atma";
+        }
+
+        .col-md-2 p {
+            font-size: 5em;
+            margin-bottom: 0px;
+            font-family: "Rubik Mono One";
+        }
+    </style>
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+        integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+        crossorigin="anonymous"></script>
+
+    <!-- jquery -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+</head>
+
+<body>
+
+
+    <div class="grade container">
+        <h1 id="title" class="text-center"><strong> Bar Chart Grade Visualizer</strong></h1>
+        <hr>
+        <form id="gradeInput">
+            <div class="row">
+                <div class="col-md-1"></div>
+                <div class="col-md-2 text-center">
+                    <p>A</p>
+                </div>
+                <div class="col-md-2 text-center">
+                    <p>B</p>
+                </div>
+                <div class="col-md-2 text-center">
+                    <p>C</p>
+                </div>
+                <div class="col-md-2 text-center">
+                    <p>D</p>
+                </div>
+                <div class="col-md-2 text-center">
+                    <p>F</p>
+                </div>
+                <div class="col-md-1"></div>
+            </div> <!-- end row -->
+
+            <div class="row">
+                <div class="col-md-1"></div>
+                <div class="col-md-2 text-center">
+                    <div class="form-group">
+                        <input type="text" class="form-control" id="As">
+                    </div> <!-- end form-group -->
+                </div>
+                <div class="col-md-2 text-center">
+                    <div class="form-group">
+                        <input type="text" class="form-control" id="Bs">
+                    </div> <!-- end form-group -->
+                </div>
+                <div class="col-md-2 text-center">
+                    <div class="form-group">
+                        <input type="text" class="form-control" id="Cs">
+                    </div> <!-- end form-group -->
+                </div>
+                <div class="col-md-2 text-center">
+                    <div class="form-group">
+                        <input type="text" class="form-control" id="Ds">
+                    </div> <!-- end form-group -->
+                </div>
+                <div class="col-md-2 text-center">
+                    <div class="form-group">
+                        <input type="text" class="form-control" id="Fs">
+                    </div> <!-- end form-group -->
+                </div>
+                <div class="col-md-1"></div>
+            </div> <!-- end row -->
+
+            <hr>
+            <div class="row">
+                <div class="col-md-12 text-center">
+                    <button type="submit" class="btn btn-success submit" id="submit" data-toggle="modal"
+                        data-target="friend-modal">Submit
+                        </button>
+
+                </div>
+            </div>
+        </form>
+
+        <div class="container">
+            <div class="chartDiv text-center"></div>
+        </div>
+    </div> <!-- end grade container -->
+
+
+
+
+    <script src="https://d3js.org/d3.v4.min.js"></script>
+
+    <script>
+
+        function checkValues() {
+
+            event.preventDefault();
+
+            var Avalue = $("#As").val().trim();
+            var Bvalue = $("#Bs").val().trim();
+            var Cvalue = $("#Cs").val().trim();
+            var Dvalue = $("#Ds").val().trim();
+            var Fvalue = $("#Fs").val().trim();
+
+            var aNum = $.isNumeric(Avalue);
+            var bNum = $.isNumeric(Bvalue);
+            var cNum = $.isNumeric(Cvalue);
+            var dNum = $.isNumeric(Dvalue);
+            var fNum = $.isNumeric(Fvalue);
+
+
+            var chartType = $("#chartType").val();
+
+            if (aNum && bNum && cNum && dNum && fNum) {
+                console.log('all numbers');
+            }
+            else {
+                alert("Enter Only Number Values Please")
+
+                $("#As").val("");
+                $("#Bs").val("");
+                $("#Cs").val("");
+                $("#Ds").val("");
+                $("#Fs").val("");
+
+            }
+
+            console.log(aNum);
+            console.log(`#As: ${Avalue} \n#Bs: ${Bvalue} \n#Cs: ${Cvalue} \n#Ds: ${Dvalue} \n #Fs: ${Fvalue} \nChart Type: ${chartType}`);
+
+            // create an array of objects based on the user input
+            var data = [
+                { name: "A", value: Avalue },
+                { name: "B", value: Bvalue },
+                { name: "C", value: Cvalue },
+                { name: "D", value: Dvalue },
+                { name: "F", value: Fvalue },
+            ]
+
+            makeBarChart(data);
+
+        } // end checkValues funtion
+
+
+        /* THIS FUNCTION DOES NOT WORK */
+        function makePieChart(data) {
+            console.log(data);
+            console.log("okay lets make a pie chart");
+
+
+            var w = 300,                        //width
+                h = 300,                            //height
+                r = 100;                           //radius
+
+            var vis = d3.select("body")
+                .append("svg:svg")              //create the SVG element inside the <body>
+                .data([data])                   //associate our data with the document
+                .attr("width", w)           //set the width and height of our visualization (these will be attributes of the <svg> tag
+                .attr("height", h)
+                .append("svg:g")                //make a group to hold our pie chart
+                .attr("transform", "translate(" + r + "," + r + ")")    //move the center of the pie chart from 0, 0 to radius, radius
+
+            var arc = d3.svg.arc()              //this will create <path> elements for us using arc data
+                .outerRadius(r);
+
+            var pie = d3.layout.pie()           //this will create arc data for us given a list of values
+                .value(function (d) { return d.value; });    //we must tell it out to access the value of each element in our data array
+
+            var arcs = vis.selectAll("g.slice")     //this selects all <g> elements with class slice (there aren't any yet)
+                .data(pie)                          //associate the generated pie data (an array of arcs, each having startAngle, endAngle and value properties) 
+                .enter()                            //this will create <g> elements for every "extra" data element that should be associated with a selection. The result is creating a <g> for every object in the data array
+                .append("svg:g")                //create a group to hold each slice (we will have a <path> and a <text> element associated with each slice)
+                .attr("class", "slice");    //allow us to style things in the slices (like text)
+
+            arcs.append("svg:path")
+                .attr("fill", function (d, i) { return Math.floor(Math.random() * 16777215).toString(16); }) //set the color for each slice to be chosen from the color function defined above
+                .attr("d", arc);                                        //this creates the actual SVG path using the associated data (pie) with the arc drawing function
+
+            arcs.append("svg:text")                                     //add a label to each slice
+                .attr("transform", function (d) {                    //set the label's origin to the center of the arc
+                    //we have to make sure to set these before calling arc.centroid
+                    d.innerRadius = 0;
+                    d.outerRadius = r;
+                    return "translate(" + arc.centroid(d) + ")";        //this gives us a pair of coordinates like [50, 50]
+                })
+                .attr("text-anchor", "middle")                          //center the text on it's origin
+                .text(function (d, i) { return data[i].label; });        //get the label from our original data array
+
+        } // end makePieChart function
+
+        function makeBarChart(data) {
+            console.log(data);
+            console.log("okay lets make a bar chart");
+
+
+            $(".chartDiv").empty();
+
+            var margin = { top: 60, right: 20, bottom: 50, left: 30 }
+                , width = 1000 - margin.left - margin.right // Use the window's width 
+                , height = 700 - margin.top - margin.bottom; // Use the window's height
+
+            var x = d3.scaleBand().range([0, width]).padding(0.1);
+            var y = d3.scaleLinear().range([height, 0]);
+
+            var svg = d3.select(".chartDiv").append("svg")
+                .attr("width", width + margin.left + margin.right)
+                .attr("height", height + margin.top + margin.bottom)
+                .append("g") // appending the axis
+                .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+
+            x.domain(data.map(function (d) { return d.name; }));
+            y.domain([0, d3.max(data, function (d) { return d.value; })]);
+
+            svg.selectAll(".bar")
+                .data(data)
+                .enter().append("rect")
+                .attr("class", "bar")
+                .attr("x", function (d) { return x(d.name); })
+                .attr("width", x.bandwidth())
+                .attr("y", function (d) { return y(d.value); })
+                .attr("height", function (d) { return height - y(d.value); });
+
+            svg.append("g")
+                .attr("transform", "translate(0," + height + ")")
+                .call(d3.axisBottom(x));
+
+            svg.append("g")
+                .call(d3.axisLeft(y));
+
+
+        } // end makeBarChart function 
+
+        $(document).on("click", "#submit", checkValues);
+    </script>
+
+</body>
+
+</html>
